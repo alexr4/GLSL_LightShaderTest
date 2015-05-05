@@ -1,3 +1,4 @@
+//based on  OpenGL 4 shading Language chapter 3
 #define PROCESSING_TEXTLIGHT_SHADER
 
 //from Processing univers
@@ -20,7 +21,7 @@ varying vec4 vertColor;
 varying vec3 ecNormal;
 varying vec3 lightDir[8];
 varying vec3 ecVertex;
-
+varying vec3 rimColor;
 
 
 // MAIN
@@ -35,6 +36,11 @@ void main() {
   }
 
   vertColor = color ;
+
+  //rim
+  vec3 v = normalize(-ecVertex);  
+	vec3 n = normalize(mat3(modelview) * normal);      // convert normal to view space                     // vector towards eye
+  rimColor = 1.0 - max(dot(v, n), 0.0);        // the rim-shading contribution
 }
 
 

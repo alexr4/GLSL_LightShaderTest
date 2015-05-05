@@ -17,22 +17,37 @@ PShader pixlightShader;
 
 ArrayList<PtLight> lightPos;
 
+PVector backgroundColor;
+PVector glslBackgroundColor;
+
+boolean debug;
+
 void setup() {
   size(1280, 720, P3D);
 
+  backgroundColor = new PVector(20, 20, 20);
+  glslBackgroundColor = new PVector();
+  glslBackgroundColor.x = map(backgroundColor.x, 0, 255, 0, 1);
+  glslBackgroundColor.y = map(backgroundColor.y, 0, 255, 0, 1);
+  glslBackgroundColor.z = map(backgroundColor.z, 0, 255, 0, 1);
+
   //mesh;
-  defineVertex(10, 10, 50, 150);
+  defineVertex(10, 10, 150, 250);
   can = createPoly();
   canNormals = createNormalPoly();
 
   //shader & lights
   defineLight(8);
   pixlightShader = loadShader("pixlightfrag.glsl", "pixlightvert.glsl");
-  pixlightShader.set("kd", new PVector(1, 1, 1));
-  pixlightShader.set("ka", new PVector(1, 1, 1));
+  pixlightShader.set("kd", new PVector(1.0, 1.0, 1.0));
+  pixlightShader.set("ka", new PVector(1.0, 1.0, 1.0));
   pixlightShader.set("ks", new PVector(1, 1, 1));
-  pixlightShader.set("emissive", new PVector(0.1, 0.1, 0.1));
+  pixlightShader.set("emissive", glslBackgroundColor);// new PVector(0.1, 0.1, 0.1));
   pixlightShader.set("shininess", 100.0);
+  pixlightShader.set("fogMinDist", 50.0);
+  pixlightShader.set("fogMaxDist", 2000.0);
+  pixlightShader.set("fogColor", glslBackgroundColor);
+  pixlightShader.set("rimPower", 0.75);
 
   //camera
   cam = new PeasyCam(this, 500);
@@ -40,29 +55,42 @@ void setup() {
   cam.setMaximumDistance(2000);
 }
 
-void draw() {    
+void draw() {
+  //translate(0, 0, abs(sin(frameCount * 0.005) * 2000) * -1);
   rotateX(frameCount * 0.001);
   rotateY(frameCount * 0.001);
   rotateZ(frameCount * 0.001);
-  background(40);
+  background(backgroundColor.x, backgroundColor.y, backgroundColor.z);
 
-  pushStyle();
-  strokeWeight(10);
   for (PtLight p : lightPos)
   {
     p.updates();
-   /* stroke(p.r, p.g, p.b);
-    point(p.x, p.y, p.z);*/
     pointLight(p.r, p.g, p.b, p.x, p.y, p.z);
   }
-  popStyle();
 
   //shape
+   pixlightShader.set("timer", frameCount * 0.005);
   shader(pixlightShader);
-  shape(can); 
-  //shape(canNormals);   
+  shape(can);
 
-  //drawAxis(250, "RVB");
+  showDebug(debug);
+}
+
+void showDebug(boolean state)
+{
+  if (state)
+  {
+    pushStyle();
+    strokeWeight(10);
+    for (PtLight p : lightPos)
+    {
+      stroke(p.r, p.g, p.b);
+      point(p.x, p.y, p.z);
+    }
+    popStyle();
+    shape(canNormals);   
+    drawAxis(250, "RVB");
+  }
 }
 
 void defineLight(int nb)
@@ -83,16 +111,16 @@ void defineVertex(float thetaOffset, float etaOffset, float minRadius, float max
   cols = round(180 / thetaOffset);
   rows = round(360 / etaOffset);
   vertice = new PVector[cols][rows];
-  
+
 
   for (int i = 0; i<cols; i++)
   {
     for (int j = 0; j<rows; j++)
     { 
-       
-     // float radius = random(minRadius, maxRadius);
+
+      // float radius = random(minRadius, maxRadius);
       float radius = minRadius + noise(i, j) * (maxRadius - minRadius);// * maxRadius;
-     
+
 
       float alpha = map(i, 0, cols-1, 0, PI);
       float beta = map(j, 0, rows-1, 0, TWO_PI);
@@ -166,11 +194,20 @@ PShape createPoly()
       n3.add(nV0);
       n3.div(2);
 
+      // color
+      PVector c = PVector.sub(v0, origin);
+      c.normalize();
+      c.x = map(c.x, 0, 1, 0, 255);
+      c.y = map(c.y, 0, 1, 0, 255);
+      c.z = map(c.z, 0, 1, 0, 255); 
 
-      //sh.stroke(255, 2);
-      sh.fill(127);
+
+      //sh.stroke(c.x, c.y, c.z, 10);
+      //sh.stroke(backgroundColor.x, backgroundColor.y, backgroundColor.z);
+      //sh.fill(c.x, c.y, c.z);
       sh.noStroke();
-      //sh.strokeWeight(1);
+      sh.fill(255, 255, 255, random(255));
+      // sh.strokeWeight(5);
       //sh.noFill();
 
       //sh.normal(n.x, n.y, n.z);
@@ -180,7 +217,7 @@ PShape createPoly()
 
       //sh.normal(n.x, n.y, n.z);    
       //sh.normal(n1.x, n1.y, n1.z);
-       sh.normal(nV1.x, nV1.y, nV1.z);
+      sh.normal(nV1.x, nV1.y, nV1.z);
       sh.vertex(v1.x, v1.y, v1.z);
 
       //sh.normal(n.x, n.y, n.z); 
@@ -217,10 +254,16 @@ PShape createNormalPoly()
       nV0.mult(2.5);
       nV0.add(v0);
 
+      PVector c = PVector.sub(v0, origin);
+      c.normalize();
+      c.x = map(c.x, 0, 1, 0, 255);
+      c.y = map(c.y, 0, 1, 0, 255);
+      c.z = map(c.z, 0, 1, 0, 255); 
+
       PShape child = createShape();
 
       child.beginShape(LINES);
-      child.stroke(127, 0, 127);
+      child.stroke(c.x, c.y, c.z);
       child.vertex(v0.x, v0.y, v0.z);
       child.vertex(nV0.x, nV0.y, nV0.z);
       child.endShape();
@@ -274,5 +317,13 @@ void drawAxis(float l, String colorMode)
   stroke(zAxis); 
   line(0, 0, 0, 0, 0, l);
   popStyle();
+}
+
+void keyPressed()
+{
+  if (key == 'd')
+  {
+    debug = !debug;
+  }
 }
 

@@ -1,3 +1,4 @@
+//based on  OpenGL 4 shading Language chapter 3
 #define PROCESSING_TEXTLIGHT_SHADER
 
 //from Processing univers

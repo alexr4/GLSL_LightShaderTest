@@ -17,8 +17,17 @@ PShader pixlightShader;
 
 ArrayList<PtLight> lightPos;
 
+PVector backgroundColor;
+PVector glslBackgroundColor;
+
 void setup() {
   size(1280, 720, P3D);
+  
+  backgroundColor = new PVector(40, 40, 40);
+  glslBackgroundColor = new PVector();
+  glslBackgroundColor.x = map(backgroundColor.x, 0, 255, 0, 1);
+  glslBackgroundColor.y = map(backgroundColor.y, 0, 255, 0, 1);
+  glslBackgroundColor.z = map(backgroundColor.z, 0, 255, 0, 1);
 
   //mesh;
   defineVertex(10, 10, 50, 150);
@@ -28,11 +37,14 @@ void setup() {
   //shader & lights
   defineLight(8);
   pixlightShader = loadShader("pixlightfrag.glsl", "pixlightvert.glsl");
-  pixlightShader.set("kd", new PVector(1, 1, 1));
-  pixlightShader.set("ka", new PVector(1, 1, 1));
+  pixlightShader.set("kd", new PVector(0.25, 0.25, 0.25));
+  pixlightShader.set("ka", new PVector(0.5, 0.5, 0.5));
   pixlightShader.set("ks", new PVector(1, 1, 1));
   pixlightShader.set("emissive", new PVector(0.1, 0.1, 0.1));
-  pixlightShader.set("shininess", 100.0);
+  pixlightShader.set("shininess", 10.0);
+  pixlightShader.set("fogMinDist", 50.0);
+  pixlightShader.set("fogMaxDist", 2000.0);
+  pixlightShader.set("fogColor", glslBackgroundColor);
 
   //camera
   cam = new PeasyCam(this, 500);
@@ -40,11 +52,12 @@ void setup() {
   cam.setMaximumDistance(2000);
 }
 
-void draw() {    
+void draw() {
+  //translate(0, 0, abs(sin(frameCount * 0.005) * 2000) * -1);
   rotateX(frameCount * 0.001);
   rotateY(frameCount * 0.001);
   rotateZ(frameCount * 0.001);
-  background(40);
+  background(backgroundColor.x, backgroundColor.y, backgroundColor.z);
 
   pushStyle();
   strokeWeight(10);
@@ -168,7 +181,7 @@ PShape createPoly()
 
 
       //sh.stroke(255, 2);
-      sh.fill(127);
+      sh.fill(255);
       sh.noStroke();
       //sh.strokeWeight(1);
       //sh.noFill();

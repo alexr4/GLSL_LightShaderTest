@@ -9,15 +9,13 @@ uniform vec3 lightNormal[8];
 uniform vec4 lightPosition[8];
 // diffuse is the color element of the light
 uniform vec3 lightDiffuse[8];
-// spot light
-uniform vec2 lightSpot[8];
-
 
 
 varying vec4 vertColor;
 varying vec3 ecNormal;
 varying vec3 lightDir[8];
 varying vec3 ecVertex ;
+varying vec3 rimColor;
 
 //material
 uniform vec3 kd;//Diffuse reflectivity
@@ -25,6 +23,14 @@ uniform vec3 ka;//Ambient reflectivity
 uniform vec3 ks;//Specular reflectivity
 uniform float shininess;//shine factor
 uniform vec3 emissive;
+
+//fog
+uniform float fogMinDist;
+uniform float fogMaxDist;
+uniform vec3 fogColor;
+
+//rim
+uniform float rimPower;
 
 vec3 ads(vec3 dir, vec3 color)
 {
@@ -41,13 +47,29 @@ vec3 ads(vec3 dir, vec3 color)
 
 
 void main() {
-	vec4 final_color ;
+	//fog
+	float dist = length(ecVertex.xyz);
+	float fogFactor = (fogMaxDist - dist) / (fogMaxDist - fogMinDist);
+	fogFactor = clamp(fogFactor, 0.0, 1.0);
+
+
+	//lights
+	vec4 lightColor;
 	
 	for(int i = 0 ; i <  lightCount ; i++) 
 	{
 	  vec3 direction = normalize(lightDir[i]);
-	  final_color += vec4(ads(direction, lightDiffuse[i].xyz), 1.0);
+	  lightColor += vec4(ads(direction, lightDiffuse[i].xyz), 1.0);
 	}
 
-	gl_FragColor = vec4(emissive, 1.0) + final_color * vertColor;//vec4(emissive, 1.0) + 
+	//rim
+	vec4 rimsmooth = vec4(smoothstep(rimPower, 1.0, rimColor), 1.0);
+
+	vec4 final_light_color =  vec4(emissive, 1.0) * rimsmooth  +  lightColor * vertColor;
+
+
+	//final color
+	vec4 finalColor = mix(vec4(fogColor, 1.0), final_light_color, fogFactor);
+
+	gl_FragColor = finalColor;
 }

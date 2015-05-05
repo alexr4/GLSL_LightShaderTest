@@ -1,3 +1,4 @@
+//based on  OpenGL 4 shading Language chapter 3
 #define PROCESSING_TEXTLIGHT_SHADER
 
 //from Processing univers
@@ -20,13 +21,18 @@ varying vec4 vertColor;
 varying vec3 ecNormal;
 varying vec3 lightDir[8];
 varying vec3 ecVertex;
+varying vec3 rimColor;
 
+uniform float timer;
 
 
 // MAIN
 void main() {
-  gl_Position = transform *vertex;    
-  ecVertex = vec3(modelview * vertex);  
+
+  //animation 
+  vec4 vert = vertex + sin(timer) * color.w;
+
+  ecVertex = vec3(modelview * vert);  
 
   ecNormal = normalize(normalMatrix *normal);
 
@@ -34,7 +40,16 @@ void main() {
      lightDir[i] = normalize(lightPosition[i].xyz - ecVertex);
   }
 
-  vertColor = color ;
+  vertColor = vec4(color.xyz, 1.0) ;
+
+  //rim
+  vec3 v = normalize(-ecVertex);  
+	vec3 n = normalize(mat3(modelview) * normal);      // convert normal to view space                     // vector towards eye
+  rimColor = 1.0 - max(dot(v, n), 0.0);        // the rim-shading contribution
+
+
+
+  gl_Position = transform * vert;  
 }
 
 

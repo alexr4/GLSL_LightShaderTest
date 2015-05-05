@@ -26,6 +26,11 @@ uniform vec3 ks;//Specular reflectivity
 uniform float shininess;//shine factor
 uniform vec3 emissive;
 
+//fog
+uniform float fogMinDist;
+uniform float fogMaxDist;
+uniform vec3 fogColor;
+
 vec3 ads(vec3 dir, vec3 color)
 {
 	vec3 n = normalize(ecNormal);
@@ -41,13 +46,24 @@ vec3 ads(vec3 dir, vec3 color)
 
 
 void main() {
-	vec4 final_color ;
+	//fog
+	float dist = length(ecVertex.xyz);
+	float fogFactor = (fogMaxDist - dist) / (fogMaxDist - fogMinDist);
+	fogFactor = clamp(fogFactor, 0.0, 1.0);
+
+
+	//lights
+	vec4 lightColor;
 	
 	for(int i = 0 ; i <  lightCount ; i++) 
 	{
 	  vec3 direction = normalize(lightDir[i]);
-	  final_color += vec4(ads(direction, lightDiffuse[i].xyz), 1.0);
+	  lightColor += vec4(ads(direction, lightDiffuse[i].xyz), 1.0);
 	}
 
-	gl_FragColor = vec4(emissive, 1.0) + final_color * vertColor;//vec4(emissive, 1.0) + 
+	vec4 final_light_color =  vec4(emissive, 1.0) + lightColor * vertColor;
+
+	vec4 finalColor = mix(vec4(fogColor, 1.0), final_light_color, fogFactor);
+
+	gl_FragColor = finalColor;//vec4(emissive, 1.0) + 
 }
