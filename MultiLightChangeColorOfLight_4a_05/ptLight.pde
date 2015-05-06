@@ -45,8 +45,8 @@ class PtLight
     z =  cos(eta)*radiusZ;
 
     r = random(255);
-    g = random(255);
-    b = random(255);
+    g = r;//random(255);
+    b = r;//random(255);
 
     pos = new PVector(x, y, z);
     rgb = new PVector(r, g, b);

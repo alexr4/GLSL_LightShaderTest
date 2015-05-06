@@ -59,8 +59,6 @@ void draw() {
   rotateZ(frameCount * 0.001);
   background(backgroundColor.x, backgroundColor.y, backgroundColor.z);
 
-  pushStyle();
-  strokeWeight(10);
   for (PtLight p : lightPos)
   {
     p.updates();
@@ -68,7 +66,6 @@ void draw() {
     point(p.x, p.y, p.z);*/
     pointLight(p.r, p.g, p.b, p.x, p.y, p.z);
   }
-  popStyle();
 
   //shape
   shader(pixlightShader);
