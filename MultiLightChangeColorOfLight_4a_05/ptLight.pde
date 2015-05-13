@@ -44,7 +44,7 @@ class PtLight
     y =  sin(eta)*sin(theta)*radiusY;
     z =  cos(eta)*radiusZ;
 
-    r = random(255);
+    r = 0;//random(255);
     g = random(255);
     b = random(255);
 
