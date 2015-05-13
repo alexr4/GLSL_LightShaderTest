@@ -23,7 +23,7 @@ PVector glslBackgroundColor;
 boolean debug;
 
 void setup() {
-  size(1280, 720, P3D);
+  size(1080, 1920, P3D);
 
   backgroundColor = new PVector(20, 20, 20);
   glslBackgroundColor = new PVector();
