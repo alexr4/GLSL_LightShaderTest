@@ -39,11 +39,16 @@ void setup() {
   //shader & lights
   defineLight(8);
   pixlightShader = loadShader("pixlightfrag.glsl", "pixlightvert.glsl");
-  pixlightShader.set("kd", new PVector(1.0, 1.0, 1.0));
-  pixlightShader.set("ka", new PVector(1.0, 1.0, 1.0));
+  pixlightShader.set("kd", new PVector(0.25, 0.25, 0.25));
+  pixlightShader.set("ka", new PVector(0.5, 0.5, 0.5));
   pixlightShader.set("ks", new PVector(1, 1, 1));
+<<<<<<< HEAD
   pixlightShader.set("emissive",  glslBackgroundColor);
   pixlightShader.set("shininess", 100.0);
+=======
+  pixlightShader.set("emissive", glslBackgroundColor);// new PVector(0.1, 0.1, 0.1));
+  pixlightShader.set("shininess", 250.0);
+>>>>>>> origin/master
   pixlightShader.set("fogMinDist", 50.0);
   pixlightShader.set("fogMaxDist", 2000.0);
   pixlightShader.set("fogColor", glslBackgroundColor);
