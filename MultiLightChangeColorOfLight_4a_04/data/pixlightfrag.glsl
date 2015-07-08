@@ -15,7 +15,7 @@ varying vec4 vertColor;
 varying vec3 ecNormal;
 varying vec3 lightDir[8];
 varying vec3 ecVertex ;
-varying vec3 rimColor;
+varying vec3 rimVertPower;
 
 //material
 uniform vec3 kd;//Diffuse reflectivity
@@ -30,6 +30,7 @@ uniform float fogMaxDist;
 uniform vec3 fogColor;
 
 //rim
+uniform vec4 rimColor;
 uniform float rimPower;
 
 vec3 ads(vec3 dir, vec3 color)
@@ -63,9 +64,9 @@ void main() {
 	}
 
 	//rim
-	vec4 rimsmooth = vec4(smoothstep(rimPower, 1.0, rimColor), 1.0);
+	vec4 rimsmooth = rimColor * vec4(smoothstep(rimPower, 1.0, rimVertPower), 1.0);
 
-	vec4 final_light_color =  vec4(emissive, 1.0) * rimsmooth  +  lightColor * vertColor;
+	vec4 final_light_color = (lightColor * vertColor) + rimsmooth + vec4(emissive, 1.0);// * rimsmooth);// * vec4(emissive, 1.0));// vec4(emissive, 1.0) * rimsmooth  +  lightColor * vertColor
 
 
 	//final color

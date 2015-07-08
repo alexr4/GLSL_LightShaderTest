@@ -42,12 +42,14 @@ void setup() {
   pixlightShader.set("kd", new PVector(1.0, 1.0, 1.0));
   pixlightShader.set("ka", new PVector(1.0, 1.0, 1.0));
   pixlightShader.set("ks", new PVector(1, 1, 1));
-  pixlightShader.set("emissive", glslBackgroundColor);// new PVector(0.1, 0.1, 0.1));
+  pixlightShader.set("emissive",  glslBackgroundColor);
   pixlightShader.set("shininess", 100.0);
   pixlightShader.set("fogMinDist", 50.0);
   pixlightShader.set("fogMaxDist", 2000.0);
   pixlightShader.set("fogColor", glslBackgroundColor);
-  pixlightShader.set("rimPower", 0.75);
+  
+  pixlightShader.set("rimColor", 0.1, .1, 0.1, 1.0);
+  pixlightShader.set("rimPower", 0.5);
 
   //camera
   cam = new PeasyCam(this, 500);
