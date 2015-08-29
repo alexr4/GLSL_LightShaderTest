@@ -22,8 +22,13 @@ PVector glslBackgroundColor;
 
 boolean debug;
 
-void setup() {
+void settings() {
   size(1920, 1080, P3D);
+  PJOGL.profile = 4;
+}
+
+void setup() {
+  
 
   backgroundColor = new PVector(20, 20, 20);
   glslBackgroundColor = new PVector();
@@ -326,4 +331,3 @@ void keyPressed()
     debug = !debug;
   }
 }
-
